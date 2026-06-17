@@ -11,5 +11,8 @@ y = (~a & ~b & ~c) |
     ( a & ~b & ~c) |
     ( a & ~b &  c);
 ```
+## Synthesis Result
+
+Vivado synthesized the design into a 3-input lookup table with input buffers and an output buffer.
 
 ![Vivado synthesized schematic](images/myFirstFunctionSynthesizedImage.png)
