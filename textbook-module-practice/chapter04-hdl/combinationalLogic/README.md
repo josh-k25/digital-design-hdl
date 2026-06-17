@@ -8,7 +8,7 @@ This folder contains SystemVerilog combinational logic modules created while wor
 
 Implements a combinational Boolean function with three 1-bit inputs and one 1-bit output.
 
-## SystemVerilog
+#### SystemVerilog
 
 ```systemverilog
 assign y = (~a & ~b & ~c) |
@@ -16,15 +16,15 @@ assign y = (~a & ~b & ~c) |
            ( a & ~b &  c);
 ```
 
-### Synthesis Result
+#### Synthesis Result
 
-![Vivado synthesized schematic](images/myFirstFunctionSynthesizedImage.png)
+![Vivado synthesized schematic](myFirstFunction/images/myFirstFunctionSynthesizedImage.png)
 
-### Reduction AND Operator 
+### reductionOperators 
 
 Uses the SystemVerilog reduction AND operator to combine all eight bits of the input into one output.
 
-## SystemVerilog
+#### SystemVerilog
 
 ```systemverilog
 assign y = &a;
@@ -37,15 +37,15 @@ assign y = a[7] & a[6] & a[5] & a[4] &
            a[3] & a[2] & a[1] & a[0];
 ```
 
-### Synthesis Result 
+#### Synthesis Result 
 
-![Vivado synthesized schematic](images/reductionOperatorsSynthesizedImage.png)
+![Vivado synthesized schematic](reductionOperators/images/reductionOperatorsSynthesizedImage.png)
 
-## Description
+### functionSelector
 
 Implements a 4-bit combinational function selector. A 2-bit select input chooses which operation is performed on the two 4-bit inputs, a and b. 
 
-## SystemVerilog
+#### SystemVerilog
 
 ```systemverilog
 module functionSelector(
@@ -64,6 +64,6 @@ module functionSelector(
 endmodule
 ```
 
-## Synthesized Design 
+#### Synthesized Result
 
-![Vivado synthesized schematic](images/functionSelectorSynthesizedImage.png)#
+![Vivado synthesized schematic](functionSelector/images/functionSelectorSynthesizedImage.png)
