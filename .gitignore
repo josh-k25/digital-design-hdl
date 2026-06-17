@@ -1,0 +1,35 @@
+# Vivado generated files
+*.jou
+*.log
+*.str
+*.wdb
+*.pb
+*.dcp
+*.bit
+*.ltx
+*.rpt
+*.xml
+*.html
+*.csv
+
+# Vivado project/cache folders
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.srcs/
+*.gen/
+
+# Vivado project file
+*.xpr
+
+# Simulation outputs
+*.vcd
+*.out
+*.vvp
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
