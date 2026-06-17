@@ -10,5 +10,6 @@ The module implements a simple combinational logic with three inputs and out out
 y = (~a & ~b & ~c) |
     ( a & ~b & ~c) |
     ( a & ~b &  c);
+```
 
 ![Vivado synthesized schematic](images/myFirstFunctionSynthesizedImage.png)
