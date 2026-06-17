@@ -12,8 +12,11 @@ assign y = &a;
 
 This is equivalent to: 
 
-```assign y = a[7] & a[6] & a[5] & a[4] &
-           a[3] & a[2] & a[1] & a[0];
+```systemverilog
+assign y = a[7] & a[6] & a[5] & a[4] &
+              a[3] & a[2] & a[1] & a[0];
 ```
+
+## Synthesis Result
 
 ![Vivado synthesized schematic](images/reductionOperatorsSynthesizedImage.png)
