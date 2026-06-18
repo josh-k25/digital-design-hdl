@@ -71,6 +71,44 @@ module sampleHistoryRegister(
 
 endmodule
 ```
+
 #### Synthesis Result
 
 ![Vivado synthesized schematic](sampleHistoryRegister/images/sampleHistoryRegisterSynthImage.png)
+
+### miniAlu
+
+Implements a 4-bit combinational arithmetic logic unit that performs one of four operations based on a 2-bit operation selector.
+
+- 00 bitwise AND.
+- 01 bitwise OR.
+- 10  bitwise XOR.
+- 11  4-bit addition.
+- The output changes whenever an input or the operation selector changes.
+- The module does not store any previous values.
+
+#### SystemVerilog
+
+```systemverilog
+module miniAlu(
+    input  logic [3:0] a,
+    input  logic [3:0] b,
+    input  logic [1:0] operation,
+    output logic [3:0] result
+);
+
+    always_comb begin
+        case (operation)
+            2'b00: result = a & b;
+            2'b01: result = a | b;
+            2'b10: result = a ^ b;
+            2'b11: result = a + b;
+            default: result = 4'b0000;
+        endcase
+    end
+
+endmodule
+```
+#### Synthesis Result
+
+![Vivado synthesized schematic](miniAlu/images/miniAluSynthImage.png)
