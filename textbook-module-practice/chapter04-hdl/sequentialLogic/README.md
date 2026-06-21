@@ -272,3 +272,84 @@ endmodule
 #### Synthesis Result
 
 ![Vivado synthesized schematic](mooreTurnstile/images/mooreTurnstileSynthImage.png)
+
+### mealyVendingMachine
+
+Implements a Mealy finite state machine for a vending machine that dispenses an item after receiving at least 15 cents.
+
+- S0 represents 0 cents of stored credit.
+- S1 represents 5 cents of stored credit.
+- S2 represents 10 cents of stored credit.
+- nickel adds 5 cents to the current credit.
+- dime adds 10 cents to the current credit.
+- When the total reaches at least 15 cents, dispense becomes high during the same cycle.
+- After dispensing, the FSM returns to S0.
+- When no coin is inserted, the FSM remains in its current state.
+- dispense depends on both the current state and the coin inputs, making this a Mealy FSM.
+- reset asynchronously returns the FSM to the 0-cent state.
+- The design assumes nickel and dime are not high during the same cycle.
+
+#### SystemVerilog
+
+```systemverilog
+module mealyVendingMachine(
+    input  logic clk,
+    input  logic reset,
+    input  logic nickel,
+    input  logic dime,
+    output logic dispense
+);
+
+    typedef enum logic [1:0] {S0, S1, S2} statetype;
+    statetype state, nextstate;
+
+    // State register
+    always_ff @(posedge clk, posedge reset) begin
+        if (reset)
+            state <= S0;
+        else
+            state <= nextstate;
+    end
+
+    // Next-state and Mealy output logic
+    always_comb begin
+        nextstate = state;
+        dispense  = 1'b0;
+
+        case (state)
+            S0: begin
+                if (nickel)
+                    nextstate = S1;
+                else if (dime)
+                    nextstate = S2;
+            end
+
+            S1: begin
+                if (nickel)
+                    nextstate = S2;
+                else if (dime) begin
+                    dispense  = 1'b1;
+                    nextstate = S0;
+                end
+            end
+
+            S2: begin
+                if (nickel || dime) begin
+                    dispense  = 1'b1;
+                    nextstate = S0;
+                end
+            end
+
+            default: begin
+                nextstate = S0;
+                dispense  = 1'b0;
+            end
+        endcase
+    end
+
+endmodule
+```
+
+#### Synthesis Result
+
+![Vivado synthesized schematic](mealyVendingMachine/images/mealyVendingMachineSynthImage.png)
