@@ -171,3 +171,104 @@ endmodule
 
 ![Vivado synthesized schematic](threeSampleAnalyzer/images/threeSampleAnalyzerSynthImage.png)
 
+### mooreTurnstile
+
+Implements a Moore finite state machine that controls a turnstile with locked, unlocked, and alarm states.
+
+- S0 represents the locked state.
+- S1 represents the unlocked state.
+- S2 represents the alarm state.
+- Inserting a coin while locked moves the FSM to the unlocked state.
+- Pushing while unlocked moves the FSM back to the locked state.
+- Pushing while locked moves the FSM to the alarm state.
+- The alarm state lasts for one clock cycle before automatically returning to the locked state.
+- Inserting a coin while already unlocked keeps the FSM unlocked.
+- unlocked and alarm depend only on the current state, making this a Moore FSM.
+- reset asynchronously returns the FSM to the locked state.
+
+#### SystemVerilog
+
+```systemverilog
+module mooreTurnstile(
+    input  logic clk,
+    input  logic reset,
+    input  logic coin,
+    input  logic push,
+    output logic unlocked,
+    output logic alarm
+);
+
+    typedef enum logic [1:0] {S0, S1, S2} statetype;
+    statetype state, nextstate;
+
+    // State register
+    always_ff @(posedge clk, posedge reset) begin
+        if (reset)
+            state <= S0;
+        else
+            state <= nextstate;
+    end
+
+    // Next-state logic
+    always_comb begin
+        nextstate = state;
+
+        case (state)
+            S0: begin
+                if (coin)
+                    nextstate = S1;
+                else if (push)
+                    nextstate = S2;
+            end
+
+            S1: begin
+                if (coin)
+                    nextstate = S1;
+                else if (push)
+                    nextstate = S0;
+            end
+
+            S2: begin
+                nextstate = S0;
+            end
+
+            default: begin
+                nextstate = S0;
+            end
+        endcase
+    end
+
+    // Moore output logic
+    always_comb begin
+        unlocked = 1'b0;
+        alarm    = 1'b0;
+
+        case (state)
+            S0: begin
+                unlocked = 1'b0;
+                alarm    = 1'b0;
+            end
+
+            S1: begin
+                unlocked = 1'b1;
+                alarm    = 1'b0;
+            end
+
+            S2: begin
+                unlocked = 1'b0;
+                alarm    = 1'b1;
+            end
+
+            default: begin
+                unlocked = 1'b0;
+                alarm    = 1'b0;
+            end
+        endcase
+    end
+
+endmodule
+```
+
+#### Synthesis Result
+
+![Vivado synthesized schematic](mooreTurnstile/images/mooreTurnstileSynthImage.png)
