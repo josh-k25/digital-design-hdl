@@ -27,50 +27,6 @@ always_ff @(posedge clk, posedge reset)
 endmodule
 ```
 
-#### Synthesis Result
-![Vivado synthesized schematic](asyncResetRegister/images/asyncResetRegisterSynthImage.png)
-
-### sampleHistoryRegister
-
-Implements two 4-bit registers that store the two most recently captured input values.
-
-- current stores the newest captured value.
-- previous stores the value that was previously held in current.
-- reset asynchronously clears both registers.
-- clear synchronously clears both registers.
-- capture enables a new value to be stored.
-- When capture is low, both registers retain their existing values.
-
-#### SystemVerilog
-
-```systemverilog
-module sampleHistoryRegister(
-    input  logic       clk,
-    input  logic       reset,
-    input  logic       clear,
-    input  logic       capture,
-    input  logic [3:0] d,
-    output logic [3:0] current,
-    output logic [3:0] previous
-);
-
-    always_ff @(posedge clk, posedge reset) begin
-        if (reset) begin
-            current  <= 4'b0000;
-            previous <= 4'b0000;
-        end
-        else if (clear) begin
-            current  <= 4'b0000;
-            previous <= 4'b0000;
-        end
-        else if (capture) begin
-            previous <= current;
-            current  <= d;
-        end
-    end
-
-endmodule
-```
 #### Testbench
 
 The testbench generates a clock and checks the main behaviors of the register:
@@ -198,6 +154,51 @@ When all tests pass, the simulation prints:
 Testing complete.
 
 If a test fails, the testbench prints the failed behavior, actual output, expected output, and simulation time.
+
+#### Synthesis Result
+![Vivado synthesized schematic](asyncResetRegister/images/asyncResetRegisterSynthImage.png)
+
+### sampleHistoryRegister
+
+Implements two 4-bit registers that store the two most recently captured input values.
+
+- current stores the newest captured value.
+- previous stores the value that was previously held in current.
+- reset asynchronously clears both registers.
+- clear synchronously clears both registers.
+- capture enables a new value to be stored.
+- When capture is low, both registers retain their existing values.
+
+#### SystemVerilog
+
+```systemverilog
+module sampleHistoryRegister(
+    input  logic       clk,
+    input  logic       reset,
+    input  logic       clear,
+    input  logic       capture,
+    input  logic [3:0] d,
+    output logic [3:0] current,
+    output logic [3:0] previous
+);
+
+    always_ff @(posedge clk, posedge reset) begin
+        if (reset) begin
+            current  <= 4'b0000;
+            previous <= 4'b0000;
+        end
+        else if (clear) begin
+            current  <= 4'b0000;
+            previous <= 4'b0000;
+        end
+        else if (capture) begin
+            previous <= current;
+            current  <= d;
+        end
+    end
+
+endmodule
+```
 
 #### Synthesis Result
 
