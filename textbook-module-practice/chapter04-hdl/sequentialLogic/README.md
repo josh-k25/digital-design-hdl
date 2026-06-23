@@ -71,6 +71,133 @@ module sampleHistoryRegister(
 
 endmodule
 ```
+#### Testbench
+
+The testbench generates a clock and checks the main behaviors of the register:
+
+- asynchronous reset clears q,
+- q captures d on a rising clock edge,
+- q holds its previous value between rising edges,
+- new data is captured on later rising edges,
+- asserting reset between clock edges clears a nonzero value immediately.
+
+The testbench uses @(posedge clk) and @(negedge clk) to synchronize its tests with the generated clock. A short #1 delay is used after clock and reset events so that nonblocking assignments in the DUT can update before the output is checked.
+
+```systemverilog
+`timescale 1ns/1ps
+
+module asyncResetRegister_tb;
+
+    logic clk;
+    logic reset;
+    logic [3:0] d;
+    logic [3:0] q;
+
+    asyncResetRegister dut (
+        .clk(clk),
+        .reset(reset),
+        .d(d),
+        .q(q)
+    );
+
+    // Clock generator that changes every 5 ns
+    always #5 clk = ~clk;
+
+    initial begin
+        clk   = 1'b0;
+        reset = 1'b0;
+        d     = 4'b1001;
+
+        // Test 1: asynchronous reset
+        #2;
+        reset = 1'b1;
+        #1;
+
+        if (q !== 4'b0000)
+            $display(
+                "Initial reset failed: q=%b expected=%b time=%t",
+                q, 4'b0000, $time
+            );
+
+        // Test 2: release reset and capture a value
+        reset = 1'b0;
+        d = 4'b1011;
+
+        @(posedge clk);
+        #1;
+
+        if (q !== 4'b1011)
+            $display(
+                "Capture failed: d=%b q=%b expected=%b time=%t",
+                d, q, 4'b1011, $time
+            );
+
+        // Test 3: change d between rising edges and verify q holds
+        d = 4'b0101;
+        #2;
+
+        if (q !== 4'b1011)
+            $display(
+                "Hold failed: d=%b q=%b expected=%b time=%t",
+                d, q, 4'b1011, $time
+            );
+
+        // Test 4: capture the new value on the next rising edge
+        @(posedge clk);
+        #1;
+
+        if (q !== 4'b0101)
+            $display(
+                "Second capture failed: d=%b q=%b expected=%b time=%t",
+                d, q, 4'b0101, $time
+            );
+
+        // Test 5: load a nonzero value before testing reset
+        d = 4'b1111;
+
+        @(posedge clk);
+        #1;
+
+        if (q !== 4'b1111)
+            $display(
+                "Third capture failed: d=%b q=%b expected=%b time=%t",
+                d, q, 4'b1111, $time
+            );
+
+        // Assert reset between rising edges
+        @(negedge clk);
+        #1;
+        reset = 1'b1;
+        #1;
+
+        if (q !== 4'b0000)
+            $display(
+                "Asynchronous reset failed: q=%b expected=%b time=%t",
+                q, 4'b0000, $time
+            );
+
+        $display("Testing complete.");
+        $finish;
+    end
+
+endmodule
+```
+
+#### Running the Testbench
+
+From the asyncResetRegister folder, compile the DUT and testbench together:
+
+iverilog -g2012 -s asyncResetRegister_tb -o asyncResetRegister_tb.vvp src\asyncResetRegister.sv testbenches\asyncResetRegister_tb.sv
+
+Run the compiled simulation:
+
+vvp asyncResetRegister_tb.vvp
+
+When all tests pass, the simulation prints:
+
+Testing complete.
+
+If a test fails, the testbench prints the failed behavior, actual output, expected output, and simulation time.
 
 #### Synthesis Result
 

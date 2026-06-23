@@ -185,8 +185,6 @@ endmodule
 
 #### Running the Testbench
 
-Running the Testbench
-
 From the miniAlu folder, compile the DUT and testbench together:
 
 iverilog -g2012 -s miniALU_tb -o miniALU_tb.vvp src\miniAlu.sv testbench\miniALU_tb.sv
