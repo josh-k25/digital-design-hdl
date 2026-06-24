@@ -870,6 +870,354 @@ module mealyVendingMachine(
 endmodule
 ```
 
+#### Testbench
+
+The self-checking testbench generates a 10 ns clock and verifies the main behaviors of the Mealy vending machine FSM:
+
+- asynchronous reset returns the machine to the 0-cent state,
+- inserting one nickel stores 5 cents without dispensing,
+- inserting one dime stores 10 cents without dispensing,
+- a dime inserted while 5 cents are stored causes immediate dispensing,
+- a nickel inserted while 10 cents are stored causes immediate dispensing,
+- two nickels move the FSM from 0 cents to 5 cents and then to 10 cents,
+- a third nickel causes dispensing,
+- after dispensing, the FSM returns to the 0-cent state,
+- stored credit is retained when no coin is inserted.
+
+The Mealy timing tests check dispense before the next rising clock edge. Because dispense depends on both the current state and the coin inputs, it can become high immediately when the inserted coin raises the total credit to at least 15 cents.
+
+The coin inputs are treated as temporary pulses. After a coin is sampled or used to produce a Mealy output, the corresponding input is returned low so that it is not interpreted as another coin.
+
+An error counter records each failed test. The simulation reports whether all tests passed before stopping.
+
+```systemverilog
+`timescale 1ns/1ps
+module mealyVendingMachine_tb;
+
+    logic clk;
+    logic reset;
+    logic nickel;
+    logic dime;
+    logic dispense;
+
+    integer errors;
+
+    mealyVendingMachine dut (
+        .clk(clk),
+        .reset(reset),
+        .nickel(nickel),
+        .dime(dime),
+        .dispense(dispense)
+    );
+
+    // 10 ns clock period
+    always #5 clk = ~clk;
+
+    initial begin
+
+        clk      = 1'b0;
+        reset    = 1'b0;
+        nickel   = 1'b0;
+        dime     = 1'b0;
+        errors   = 0;
+
+        //test 1: asynchronous reset away from rising edge
+
+        #2;
+        reset = 1'b1;
+
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Reset failed: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        reset = 1'b0;
+
+        //test 2: insert a nickel from 0 cents to reach 5 cents
+
+        @(negedge clk);
+        nickel = 1'b1;
+        dime   = 1'b0;
+
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Dispense failed before posedge (showed high with 5 cents): dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(posedge clk);
+        #1;
+
+        nickel = 1'b0;
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Dispense failed after posedge (showed high with 5 cents): dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        //test 3: prove Mealy timing with dime while at 5 cents
+
+        @(negedge clk);
+        dime = 1'b1;
+
+        #1;
+
+        // While still in the 5-cent state, the dime should make dispense high before the next rising edge.
+        if (dispense !== 1'b1) begin
+            $display(
+                "Mealy timing failed: dispense=%b expected=%b time=%t", dispense, 1'b1, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(posedge clk);
+        #1;
+
+        // The rising edge moves the FSM back to S0. With the FSM now in S0, dispense should return low.
+        if (dispense !== 1'b0) begin
+            $display(
+                "Return to zero-credit state failed: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        dime = 1'b0;
+
+        //test 4: insert a dime from 0 cents to reach 10 cents
+
+        @(negedge clk);
+        dime = 1'b1;
+
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Dime from 0 cents dispensed too early: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(posedge clk);
+        #1;
+
+        dime = 1'b0;
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Dime from 0 cents incorrectly dispensed after being stored: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        //test 5: add nickel while at 10 cents
+
+        @(negedge clk);
+        nickel = 1'b1;
+
+        #1;
+
+        if (dispense !== 1'b1) begin
+            $display(
+                "Dispense failed: dispense=%b expected=%b time=%t", dispense, 1'b1, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(posedge clk);
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Dispense reset failed: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        nickel = 1'b0;
+
+        //test 6: insert two nickels to reach 10 cents
+
+        @(negedge clk);
+        nickel = 1'b1;
+
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Nickel from 0 cents dispensed too early: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(posedge clk);
+        #1;
+
+        nickel = 1'b0;
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Nickel from 0 cents dispensed after being stored: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(negedge clk);
+        nickel = 1'b1;
+
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Nickel from 5 cents dispensed too early: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(posedge clk);
+        #1;
+
+        nickel = 1'b0;
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Second nickel incorrectly dispensed after reaching 10 cents: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        //test 7: add another nickel while at 10 cents
+
+        @(negedge clk);
+        nickel = 1'b1;
+
+        #1;
+
+        if (dispense !== 1'b1) begin
+            $display(
+                "Nickel from 10 cents did not dispense: dispense=%b expected=%b time=%t", dispense, 1'b1, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(posedge clk);
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Dispense reset from 15 cents failed: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        nickel = 1'b0;
+
+        //test 8: hold state when no coin is inserted
+
+        @(negedge clk);
+        nickel = 1'b1;
+
+        @(posedge clk);
+        #1;
+
+        nickel = 1'b0;
+        #1;
+
+        @(posedge clk);
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "No-coin hold produced dispense: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(negedge clk);
+        dime = 1'b1;
+
+        #1;
+
+        if (dispense !== 1'b1) begin
+            $display(
+                "Hold state failed: dispense=%b expected=%b time=%t", dispense, 1'b1, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        dime = 1'b0;
+        #1;
+
+        if (dispense !== 1'b0) begin
+            $display(
+                "Dispense did not return low after dime was removed: dispense=%b expected=%b time=%t", dispense, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        if (errors == 0)
+            $display("ALL TESTS PASSED");
+        else
+            $display("%0d TESTS FAILED", errors);
+
+        $finish;
+    end
+
+endmodule
+```
+
+#### Running the Testbench
+
+From the mealyVendingMachine folder, compile the DUT and testbench together:
+
+```powershell
+iverilog -g2012 -s mealyVendingMachine_tb -o mealyVendingMachine_tb.vvp src\mealyVendingMachine.sv testbenches\mealyVendingMachine_tb.sv
+```
+
+Run the compiled simulation:
+
+```powershell
+vvp mealyVendingMachine_tb.vvp
+```
+
+When all tests pass, the simulation prints:
+
+```text
+ALL TESTS PASSED
+```
+
+If a test fails, the testbench prints the failed behavior, actual output, expected output, and simulation time.
+
 #### Synthesis Result
 
 ![Vivado synthesized schematic](mealyVendingMachine/images/mealyVendingMachineSynthImage.png)
