@@ -71,8 +71,7 @@ module asyncResetRegister_tb;
 
         if (q !== 4'b0000)
             $display(
-                "Initial reset failed: q=%b expected=%b time=%t",
-                q, 4'b0000, $time
+                "Initial reset failed: q=%b expected=%b time=%t", q, 4'b0000, $time
             );
 
         // Test 2: release reset and capture a value
@@ -84,8 +83,7 @@ module asyncResetRegister_tb;
 
         if (q !== 4'b1011)
             $display(
-                "Capture failed: d=%b q=%b expected=%b time=%t",
-                d, q, 4'b1011, $time
+                "Capture failed: d=%b q=%b expected=%b time=%t", d, q, 4'b1011, $time
             );
 
         // Test 3: change d between rising edges and verify q holds
@@ -94,8 +92,7 @@ module asyncResetRegister_tb;
 
         if (q !== 4'b1011)
             $display(
-                "Hold failed: d=%b q=%b expected=%b time=%t",
-                d, q, 4'b1011, $time
+                "Hold failed: d=%b q=%b expected=%b time=%t", d, q, 4'b1011, $time
             );
 
         // Test 4: capture the new value on the next rising edge
@@ -104,8 +101,7 @@ module asyncResetRegister_tb;
 
         if (q !== 4'b0101)
             $display(
-                "Second capture failed: d=%b q=%b expected=%b time=%t",
-                d, q, 4'b0101, $time
+                "Second capture failed: d=%b q=%b expected=%b time=%t", d, q, 4'b0101, $time
             );
 
         // Test 5: load a nonzero value before testing reset
@@ -116,8 +112,7 @@ module asyncResetRegister_tb;
 
         if (q !== 4'b1111)
             $display(
-                "Third capture failed: d=%b q=%b expected=%b time=%t",
-                d, q, 4'b1111, $time
+                "Third capture failed: d=%b q=%b expected=%b time=%t", d, q, 4'b1111, $time
             );
 
         // Assert reset between rising edges
@@ -128,8 +123,7 @@ module asyncResetRegister_tb;
 
         if (q !== 4'b0000)
             $display(
-                "Asynchronous reset failed: q=%b expected=%b time=%t",
-                q, 4'b0000, $time
+                "Asynchronous reset failed: q=%b expected=%b time=%t", q, 4'b0000, $time
             );
 
         $display("Testing complete.");
@@ -260,8 +254,7 @@ module sampleHistoryRegister_tb;
             (previous !== 4'b0000)) begin
 
             $display(
-                "Reset failed: current=%b previous=%b time=%t",
-                current, previous, $time
+                "Reset failed: current=%b previous=%b time=%t", current, previous, $time
             );
 
             errors = errors + 1;
@@ -281,8 +274,7 @@ module sampleHistoryRegister_tb;
             (previous !== 4'b0000)) begin
 
             $display(
-                "First capture failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
-                current, previous, 4'b1101, 4'b0000, $time
+                "First capture failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t", current, previous, 4'b1101, 4'b0000, $time
             );
 
             errors = errors + 1;
@@ -299,8 +291,7 @@ module sampleHistoryRegister_tb;
             (previous !== 4'b0000)) begin
 
             $display(
-                "Hold failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
-                current, previous, 4'b1101, 4'b0000, $time
+                "Hold failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t", current, previous, 4'b1101, 4'b0000, $time
             );
 
             errors = errors + 1;
@@ -317,8 +308,7 @@ module sampleHistoryRegister_tb;
             (previous !== 4'b1101)) begin
 
             $display(
-                "Second capture failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
-                current, previous, 4'b0101, 4'b1101, $time
+                "Second capture failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t", current, previous, 4'b0101, 4'b1101, $time
             );
 
             errors = errors + 1;
@@ -335,8 +325,7 @@ module sampleHistoryRegister_tb;
             (previous !== 4'b1101)) begin
 
             $display(
-                "Synchronous clear failed (cleared too early): current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
-                current, previous, 4'b0101, 4'b1101, $time
+                "Synchronous clear failed (cleared too early): current=%b previous=%b expected_current=%b expected_previous=%b time=%t", current, previous, 4'b0101, 4'b1101, $time
             );
 
             errors = errors + 1;
@@ -349,8 +338,7 @@ module sampleHistoryRegister_tb;
             (previous !== 4'b0000)) begin
 
             $display(
-                "Synchronous clear failed (did not clear): current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
-                current, previous, 4'b0000, 4'b0000, $time
+                "Synchronous clear failed (did not clear): current=%b previous=%b expected_current=%b expected_previous=%b time=%t", current, previous, 4'b0000, 4'b0000, $time
             );
 
             errors = errors + 1;
@@ -370,8 +358,7 @@ module sampleHistoryRegister_tb;
             (previous !== 4'b0000)) begin
 
             $display(
-                "Clear priority over capture failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
-                current, previous, 4'b0000, 4'b0000, $time
+                "Clear priority over capture failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t", current, previous, 4'b0000, 4'b0000, $time
             );
 
             errors = errors + 1;
@@ -562,6 +549,234 @@ module mooreTurnstile(
 
 endmodule
 ```
+
+#### Testbench
+
+The self-checking testbench generates a 10 ns clock and verifies the main behaviors of the Moore turnstile FSM:
+
+- asynchronous reset immediately returns the turnstile to the locked state,
+- inserting a coin while locked moves the FSM to the unlocked state,
+- changing push before a rising edge does not immediately change the outputs,
+- pushing while unlocked returns the FSM to the locked state,
+- pushing while locked activates the alarm,
+- the alarm state automatically returns to the locked state after one clock cycle,
+- inserting another coin while already unlocked keeps the FSM unlocked,
+- the current state is retained when both inputs are low.
+
+The Moore timing test demonstrates that unlocked and alarm depend only on the current state. Changing an input may change nextstate, but the outputs do not change until the stored state updates on a rising clock edge.
+
+An error counter records each failed test. The simulation reports whether all tests passed before stopping.
+
+```systemverilog
+`timescale 1ns/1ps
+
+module mooreTurnstile_tb;
+
+    logic clk;
+    logic reset;
+    logic coin;
+    logic push;
+    logic unlocked;
+    logic alarm;
+
+    integer errors;
+
+    mooreTurnstile dut (
+        .clk(clk),
+        .reset(reset),
+        .coin(coin),
+        .push(push),
+        .unlocked(unlocked),
+        .alarm(alarm)
+    );
+
+    // 10 ns clock period
+    always #5 clk = ~clk;
+
+    initial begin
+
+        clk    = 1'b0;
+        reset  = 1'b0;
+        coin   = 1'b0;
+        push   = 1'b0;
+        errors = 0;
+
+        //test 1: asynchronous test away from rising edge (machine should lock instantly)
+        #2;
+        reset = 1'b1;
+
+        #1;
+
+        if ((unlocked !== 1'b0) || (alarm !== 1'b0)) begin
+
+            $display(
+                "Reset failed: unlocked=%b alarm=%b time=%t", unlocked, alarm, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        reset = 1'b0;
+
+        //test 2: insert a coin while locked to unlock after rising edge
+
+        @(negedge clk);
+        coin = 1'b1;
+        push = 1'b0;
+
+        @(posedge clk);
+        #1;
+
+        if ((unlocked !== 1'b1) || (alarm !== 1'b0)) begin
+            $display(
+                "Unlock failed: unlocked=%b alarm=%b expected_unlocked=%b expected_alarm=%b time=%t", unlocked, alarm, 1'b1, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        coin = 1'b0;
+
+        //test 3: prove Moore timing (push only affects nextstate not output)
+        @(negedge clk);
+        push = 1'b1;
+
+        #1;
+
+        if ((unlocked !== 1'b1) || (alarm !== 1'b0)) begin
+            $display(
+                "Moore timing failed (push changed output): unlocked=%b alarm=%b expected_unlocked=%b expected_alarm=%b time=%t", unlocked, alarm, 1'b1, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(posedge clk);
+        #1;
+
+        if ((unlocked !== 1'b0) || (alarm !== 1'b0)) begin
+            $display(
+                "Moore timing failed (push did not change next state): unlocked=%b alarm=%b expected_unlocked=%b expected_alarm=%b time=%t", unlocked, alarm, 1'b0, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        push = 1'b0;
+
+        //test 4: push while locked
+
+        @(negedge clk);
+        push = 1'b1;
+
+        @(posedge clk);
+        #1;
+
+        if ((unlocked !== 1'b0) || (alarm !== 1'b1)) begin
+            $display(
+                "Alarm failed: unlocked=%b alarm=%b expected_unlocked=%b expected_alarm=%b time=%t", unlocked, alarm, 1'b0, 1'b1, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        push = 1'b0;
+
+        //test 5: alarm returns to locked after 1 cycle
+        @(posedge clk);
+        #1;
+
+        if ((unlocked !== 1'b0) || (alarm !== 1'b0)) begin
+            $display(
+                "Autolocking failed: unlocked=%b alarm=%b expected_unlocked=%b expected_alarm=%b time=%t", unlocked, alarm, 1'b0, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        //test 6: add coin while already unlocked
+
+        // First coin: move from locked to unlocked
+        coin = 1'b1;
+        push = 1'b0;
+
+        @(posedge clk);
+        #1;
+
+        if ((unlocked !== 1'b1) || (alarm !== 1'b0)) begin
+            $display(
+                "Initial unlock failed: unlocked=%b alarm=%b expected_unlocked=%b expected_alarm=%b time=%t", unlocked, alarm, 1'b1, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(negedge clk);
+        coin = 1'b0;
+
+        #1;
+        coin = 1'b1;
+
+        @(posedge clk);
+        #1;
+
+        if ((unlocked !== 1'b1) || (alarm !== 1'b0)) begin
+            $display(
+                "Coin while unlocked failed: unlocked=%b alarm=%b expected_unlocked=%b expected_alarm=%b time=%t", unlocked, alarm, 1'b1, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        coin = 1'b0;
+
+        //test 7: hold state (test low for both inputs)
+        coin = 1'b0;
+        push = 1'b0;
+
+        @(posedge clk);
+        #1;
+
+        if ((unlocked !== 1'b1) || (alarm !== 1'b0)) begin
+            $display(
+                "Hold state failed: unlocked=%b alarm=%b expected_unlocked=%b expected_alarm=%b time=%t", unlocked, alarm, 1'b1, 1'b0, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        if (errors == 0)
+            $display("ALL TESTS PASSED");
+        else
+            $display("%0d TESTS FAILED", errors);
+
+        $finish;
+    end
+
+endmodule
+```
+
+#### Running the Testbench
+
+From the mooreTurnstile folder, compile the DUT and testbench together:
+
+```powershell
+iverilog -g2012 -s mooreTurnstile_tb -o mooreTurnstile_tb.vvp src\mooreTurnstile.sv testbenches\mooreTurnstile_tb.sv
+```
+
+Run the compiled simulation:
+
+```powershell
+vvp mooreTurnstile_tb.vvp
+```
+
+When all tests pass, the simulation prints:
+
+```text
+ALL TESTS PASSED
+```
+
+If a test fails, the testbench prints the failed behavior, actual outputs, expected outputs, and simulation time.
 
 #### Synthesis Result
 
