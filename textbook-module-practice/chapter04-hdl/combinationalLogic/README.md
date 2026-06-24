@@ -187,15 +187,21 @@ endmodule
 
 From the miniAlu folder, compile the DUT and testbench together:
 
+```powershell
 iverilog -g2012 -s miniALU_tb -o miniALU_tb.vvp src\miniAlu.sv testbench\miniALU_tb.sv
+```
 
 Run the compiled simulation:
 
+```powershell
 vvp miniALU_tb.vvp
+```
 
 When all tests pass, the simulation prints:
 
+```powershell
 Testing complete.
+```
 
 If a result is incorrect, the testbench prints the operation, inputs, actual result, and expected result.
 

@@ -137,15 +137,21 @@ endmodule
 
 From the asyncResetRegister folder, compile the DUT and testbench together:
 
+```powershell
 iverilog -g2012 -s asyncResetRegister_tb -o asyncResetRegister_tb.vvp src\asyncResetRegister.sv testbenches\asyncResetRegister_tb.sv
+```
 
 Run the compiled simulation:
 
+```powershell
 vvp asyncResetRegister_tb.vvp
+```
 
 When all tests pass, the simulation prints:
 
+```powershell
 Testing complete.
+```
 
 If a test fails, the testbench prints the failed behavior, actual output, expected output, and simulation time.
 
@@ -378,15 +384,20 @@ endmodule
 
 From the sampleHistoryRegister folder, compile the DUT and testbench together:
 
+```powershell
 iverilog -g2012 -s sampleHistoryRegister_tb -o sampleHistoryRegister_tb.vvp src\sampleHistoryRegister.sv testbenches\sampleHistoryRegister_tb.sv
+```
 
 Run the compiled simulation:
 
+```powershell
 vvp sampleHistoryRegister_tb.vvp
-
+```
 When all tests pass, the simulation prints:
 
+```powershell
 ALL TESTS PASSED
+```
 
 If a test fails, the testbench prints the failed behavior, actual outputs, expected outputs, and simulation time.
 
