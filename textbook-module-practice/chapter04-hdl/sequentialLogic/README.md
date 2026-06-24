@@ -199,6 +199,209 @@ module sampleHistoryRegister(
 
 endmodule
 ```
+#### Testbench
+
+The self-checking testbench generates a 10 ns clock and verifies the main behaviors of the sample history register:
+
+- asynchronous reset immediately clears current and previous,
+- the first captured input is stored in current,
+- previous receives the old value of current,
+- both registers hold their values while capture is disabled,
+- clear does not affect the registers until a rising clock edge,
+- clear has priority over capture when both controls are asserted.
+
+An error counter records each failed test. The simulation reports whether all tests passed before stopping.
+
+```systemverilog
+`timescale 1ns/1ps 
+
+module sampleHistoryRegister_tb;
+
+    logic clk;
+    logic reset;
+    logic clear;
+    logic capture;
+    logic [3:0] d;
+    logic [3:0] current;
+    logic [3:0] previous;
+
+    integer errors;
+
+    sampleHistoryRegister dut(
+        .clk(clk),
+        .reset(reset),
+        .clear(clear),
+        .capture(capture),
+        .d(d),
+        .current(current),
+        .previous(previous)
+    );
+
+    // 10 ns clock period
+    always #5 clk = ~clk;
+
+    initial begin
+
+        clk = 1'b0;
+        reset = 1'b0;
+        clear = 1'b0;
+        capture = 1'b0;
+        d = 4'b0110;
+        errors = 0;
+
+        // Test 1: asynchronous reset away from a rising edge
+        @(negedge clk);
+        #1;
+
+        reset = 1'b1;
+        #1;
+
+        if ((current !== 4'b0000) ||
+            (previous !== 4'b0000)) begin
+
+            $display(
+                "Reset failed: current=%b previous=%b time=%t",
+                current, previous, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        // Release reset
+        reset = 1'b0;
+
+        // Test 2: first capture
+        d = 4'b1101;
+        capture = 1'b1;
+
+        @(posedge clk);
+        #1;
+
+        if ((current !== 4'b1101) ||
+            (previous !== 4'b0000)) begin
+
+            $display(
+                "First capture failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
+                current, previous, 4'b1101, 4'b0000, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        // Test 3: hold when capture is disabled
+        capture = 1'b0;
+        d = 4'b1111;
+
+        @(posedge clk);
+        #1;
+
+        if ((current !== 4'b1101) ||
+            (previous !== 4'b0000)) begin
+
+            $display(
+                "Hold failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
+                current, previous, 4'b1101, 4'b0000, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        // Test 4: second capture
+        capture = 1'b1;
+        d = 4'b0101;
+
+        @(posedge clk);
+        #1;
+
+        if ((current !== 4'b0101) ||
+            (previous !== 4'b1101)) begin
+
+            $display(
+                "Second capture failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
+                current, previous, 4'b0101, 4'b1101, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        // Test 5: synchronous clear
+        @(negedge clk);
+        #1;
+
+        clear = 1'b1;
+        #1;
+
+        if ((current !== 4'b0101) ||
+            (previous !== 4'b1101)) begin
+
+            $display(
+                "Synchronous clear failed (cleared too early): current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
+                current, previous, 4'b0101, 4'b1101, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        @(posedge clk);
+        #1;
+
+        if ((current !== 4'b0000) ||
+            (previous !== 4'b0000)) begin
+
+            $display(
+                "Synchronous clear failed (did not clear): current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
+                current, previous, 4'b0000, 4'b0000, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        clear = 1'b0;
+
+        // Test 6: clear priority over capture
+        clear = 1'b1;
+        capture = 1'b1;
+        d = 4'b0100;
+
+        @(posedge clk);
+        #1;
+
+        if ((current !== 4'b0000) ||
+            (previous !== 4'b0000)) begin
+
+            $display(
+                "Clear priority over capture failed: current=%b previous=%b expected_current=%b expected_previous=%b time=%t",
+                current, previous, 4'b0000, 4'b0000, $time
+            );
+
+            errors = errors + 1;
+        end
+
+        if (errors == 0)
+            $display("ALL TESTS PASSED");
+        else
+            $display("%0d TESTS FAILED", errors);
+
+        $finish;
+    end
+
+endmodule
+```
+#### Running the Testbench
+
+From the sampleHistoryRegister folder, compile the DUT and testbench together:
+
+iverilog -g2012 -s sampleHistoryRegister_tb -o sampleHistoryRegister_tb.vvp src\sampleHistoryRegister.sv testbenches\sampleHistoryRegister_tb.sv
+
+Run the compiled simulation:
+
+vvp sampleHistoryRegister_tb.vvp
+
+When all tests pass, the simulation prints:
+
+ALL TESTS PASSED
+
+If a test fails, the testbench prints the failed behavior, actual outputs, expected outputs, and simulation time.
 
 #### Synthesis Result
 
