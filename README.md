@@ -8,12 +8,12 @@ The repository follows *Digital Design and Computer Architecture: RISC-V Edition
 
 The current work covers Chapter 4 topics, including:
 
-- combinational and sequential logic,
-- structural and behavioral SystemVerilog,
-- blocking and nonblocking assignments,
-- registers, counters, and finite state machines,
-- self-checking testbenches,
-- simulation with Icarus Verilog,
+- combinational and sequential logic
+- structural and behavioral SystemVerilog
+- blocking and nonblocking assignments
+- registers, counters, and finite state machines
+- self-checking testbenches
+- simulation with Icarus Verilog
 - synthesis and schematic inspection with Vivado.
 
 ## Repository Structure
@@ -69,18 +69,3 @@ vvp simulation.vvp
 ```
 
 The self-checking testbenches report whether the tested behavior passed or failed.
-
-## Roadmap
-
-The planned progression is:
-
-1. Complete SystemVerilog fundamentals and testbench practice.
-2. Build reusable arithmetic, memory, and sequential building blocks.
-3. Learn the RISC-V instruction set and datapath organization.
-4. Implement and verify a single-cycle RISC-V processor.
-5. Integrate the processor with the Basys 3 for a physical demonstration.
-6. Extend the design with a multicycle or pipelined implementation if time permits.
-
-## Purpose
-
-This repository is a learning record rather than a collection of production-ready IP. The emphasis is on understanding how each circuit works, writing readable RTL, verifying expected behavior, and gradually combining small modules into larger digital systems.
