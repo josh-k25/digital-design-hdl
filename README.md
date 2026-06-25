@@ -48,11 +48,11 @@ The README files inside each topic folder contain module descriptions, source ex
 
 ## Tools
 
-- **SystemVerilog** — RTL design and testbenches
-- **Icarus Verilog** — command-line compilation and simulation
-- **GTKWave** — waveform viewing when needed
-- **Vivado** — synthesis, implementation, and FPGA programming
-- **Basys 3** — physical FPGA demonstrations for modules that benefit from switches, LEDs, clocks, or other board I/O
+- **SystemVerilog** - RTL design and testbenches
+- **Icarus Verilog** - command-line compilation and simulation
+- **GTKWave** - waveform viewing when needed
+- **Vivado** - synthesis, implementation, and FPGA programming
+- **Basys 3** - physical FPGA demonstrations for modules that benefit from switches, LEDs, clocks, or other board I/O
 
 ## Running a Testbench
 
