@@ -2,7 +2,7 @@
 
 A growing collection of SystemVerilog modules, testbenches, synthesis results, and FPGA exercises created while learning digital logic and computer architecture.
 
-The repository follows *Digital Design and Computer Architecture: RISC-V Edition* by Sarah Harris and David Harris. The long-term goal is to build and verify the components needed for a RISC-V processor and eventually demonstrate the design on a Basys 3 FPGA.
+The repository follows *Digital Design and Computer Architecture: RISC-V Edition* by Sarah Harris and David Harris.
 
 ## Current Focus
 
