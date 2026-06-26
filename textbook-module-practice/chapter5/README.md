@@ -179,3 +179,152 @@ If a test fails, the testbench prints the values of a, b, and cin, along with th
 ### Synthesis Result
 
 ![Vivado synthesized schematic](rippleAdder/images/rippleAdderSynthImage.png)
+
+## claAdder
+
+Implements a four-bit carry-lookahead adder.
+
+The module calculates generate and propagate signals for each bit:
+
+- g[i] indicates that bit i generates a carry on its own
+- p[i] indicates that bit i propagates an incoming carry
+
+Unlike a ripple-carry adder, each carry equation is expanded so that it does not depend directly on the previous carry signal. This allows the carry signals to be calculated in parallel from the generate signals, propagate signals, and cin.
+
+The internal carry bus contains five signals:
+
+c[0] receives the external cin  
+c[1] through c[3] are the carry inputs for the remaining bit positions  
+c[4] becomes the final cout
+
+Each sum bit is calculated using its corresponding carry input.
+
+### SystemVerilog
+
+```systemverilog
+module claAdder(
+    input logic [3:0] a,
+    input logic [3:0] b,
+    input logic cin,
+    output logic [3:0] sum,
+    output logic cout
+);
+
+logic [3:0] g;
+logic [3:0] p;
+logic [4:0] c;
+
+
+assign p = a | b;
+assign g = a & b;
+
+assign c[0] = cin;
+assign c[1] = g[0] | (p[0] & c[0]);
+assign c[2] = g[1] | p[1] & (g[0] | (p[0] & c[0]));
+assign c[3] = g[2] | p[2] & (g[1] | p[1] & (g[0] | (p[0] & c[0])));
+assign c[4] = g[3] | p[3] & (g[2] | p[2] & (g[1] | p[1] & (g[0] | (p[0] & c[0]))));
+
+assign sum = a ^ b ^ c[3:0];
+
+assign cout = c[4];
+
+endmodule
+```
+
+### Testbench
+
+The testbench instantiates the carry-lookahead adder and exhaustively tests every possible input combination.
+
+The four-bit inputs a and b each have 16 possible values, while cin has two possible values. This gives:
+
+16 × 16 × 2 = 512
+
+total test cases.
+
+Three nested loops are used to test every combination of a, b, and cin.
+
+For each test it:
+
+- assigns the current loop values to a, b, and cin,
+- waits for the combinational logic to settle,
+- calculates the expected result with SystemVerilog addition,
+- compares the expected result with {cout, sum}.
+
+The operands are extended by one bit before addition to preserve the final carry bit:
+
+```systemverilog
+expected = {1'b0, a} + {1'b0, b} + cin;
+```
+
+This allows the complete result to be compared to {cout, sum} (concatenation).
+
+### SystemVerilog
+
+```systemverilog
+module claAdder_tb;
+
+logic [3:0] a;
+logic [3:0] b;
+logic cin;
+
+logic [3:0] sum;
+logic cout;
+
+logic [4:0] expected;
+
+claAdder dut(
+    .a(a),
+    .b(b),
+    .cin(cin),
+    .sum(sum),
+    .cout(cout)
+);
+
+initial begin
+    for (int ai = 0; ai < 16; ai++) begin
+        for (int bi = 0; bi < 16; bi++) begin
+            for (int ci = 0; ci < 2; ci++) begin
+                a = ai;
+                b = bi;
+                cin = ci;
+
+                #1;
+
+                expected = {1'b0, a} + {1'b0, b} + cin;
+
+                if ({cout, sum} !== expected) begin
+                    $fatal( 1, "Mismatch: a=%b b=%b cin=%b got=%b expected=%b", a, b, cin, {cout, sum}, expected
+                    );
+                end
+            end
+        end
+    end
+
+    $display("All CLA tests passed.");
+    $finish;
+end
+
+endmodule
+```
+
+### Running the Testbench
+
+From the claAdder folder, compile the carry-lookahead adder and testbench together:
+
+```powershell
+iverilog -g2012 -s claAdder_tb -o claAdder_tb.vvp src/claAdder.sv testbenches/claAdder_tb.sv
+```
+
+Run the compiled simulation:
+
+```powershell
+vvp claAdder_tb.vvp
+```
+
+When all tests pass, the following is printed:
+
+```powershell
+All CLA tests passed.
+```
+
+If a test fails, the testbench prints the values of a, b, and cin, along with the actual and expected results.
