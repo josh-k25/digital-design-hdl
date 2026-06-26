@@ -33,7 +33,7 @@ assign cout = (a & b) | (a & cin) | (b & cin);
 endmodule
 ```
 
-## rippleCarryAdder
+## rippleAdder
 
 Implements a parameterized ripple-carry adder using multiple instances of the fullAdder module.
 
