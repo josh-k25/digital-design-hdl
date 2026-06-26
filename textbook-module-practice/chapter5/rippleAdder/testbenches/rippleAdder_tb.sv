@@ -13,10 +13,10 @@ logic [WIDTH:0] expected;
 rippleCarryAdder #(
     .WIDTH(WIDTH)
 ) dut (
-    .a    (a),
-    .b    (b),
-    .cin  (cin),
-    .sum  (sum),
+    .a (a),
+    .b (b),
+    .cin (cin),
+    .sum (sum),
     .cout (cout)
 );
 

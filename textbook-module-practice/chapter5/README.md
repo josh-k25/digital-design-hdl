@@ -328,3 +328,184 @@ All CLA tests passed.
 ```
 
 If a test fails, the testbench prints the values of a, b, and cin, along with the actual and expected results.
+
+## subtractor
+
+Implements a parameterized subtractor using two’s complement addition.
+
+The default width is four bits, but the WIDTH parameter can be changed when the module is instantiated.
+
+Subtraction is performed using:
+
+```systemverilog
+a - b = a + (~b) + 1
+```
+
+The bits of b are inverted and one is added to form the two’s complement of b. This value is then added to a.
+
+The difference output contains WIDTH bits. If the mathematical result does not fit within WIDTH bits, the result wraps around and only the lowest WIDTH bits are retained.
+
+For example, with WIDTH = 4:
+
+```text
+3 - 5 = 0011 - 0101 = 1110
+```
+
+The bit pattern 1110 represents -2 when interpreted as a four-bit signed two’s complement number.
+
+### SystemVerilog
+
+```systemverilog
+module subtractor #(
+    parameter int WIDTH = 4
+)(
+    input logic [WIDTH - 1:0] a,
+    input logic [WIDTH - 1:0] b, 
+    output logic [WIDTH - 1:0] difference
+);
+
+assign difference = a + (~b) + 1;
+
+endmodule
+
+### Testbench
+
+The testbench instantiates the subtractor and checks several important subtraction cases.
+
+The tests verify:
+
+- subtraction where a is greater than b,
+- subtraction where a is less than b,
+- subtraction of two zero values.
+
+The expected result is calculated using the SystemVerilog subtraction operator.
+
+Because expected contains WIDTH bits, negative results are stored as their WIDTH-bit two’s complement representations.
+
+### SystemVerilog
+
+module subtractor_tb;
+
+localparam int WIDTH = 4;
+
+logic [WIDTH - 1:0] a;
+logic [WIDTH - 1:0] b;
+logic [WIDTH - 1:0] difference;
+
+logic [WIDTH - 1:0] expected;
+
+subtractor #(
+    .WIDTH(WIDTH)
+) dut (
+    .a(a),
+    .b(b),
+    .difference(difference)
+);
+
+initial begin
+    //test 1: 5 - 3 = 2
+    a = 4'b0101;
+    b = 4'b0011;
+
+    #1;
+
+    expected = 5 - 3;
+
+    if (difference !== expected) begin
+        $fatal(
+            1, "5 - 3 failed: a=%b b=%b, difference=%b expected=%b"
+        );
+    end
+
+    //test 2: 3 - 5 = -2, represented as 1110
+    a = 4'b0011;
+    b = 4'b0101;
+
+    #1;
+
+    expected = 3 - 5;
+
+    if (difference !== expected) begin
+        $fatal(
+            1, "3 - 5 failed: a=%b b=%b, difference=%b expected=%b"
+        );
+    end
+
+    //test 3: 0 - 0 = 0
+    a = 4'b0000;
+    b = 4'b0000;
+
+    #1;
+
+    expected = 0 - 0;
+
+    if (difference !== expected) begin
+        $fatal(
+            1, "0 - 0 failed: a=%b b=%b, difference=%b expected=%b"
+        );
+    end
+    
+    $display("All subtractor tests passed.");
+    $finish;
+end
+
+endmodule
+```
+
+### Running the Testbench
+
+From the subtractor folder, compile the subtractor and testbench together:
+
+```powershell
+iverilog -g2012 -s subtractor_tb -o subtractor_tb.vvp src/subtractor.sv testbenches/subtractor_tb.sv
+```
+
+Run the compiled simulation:
+
+```powershell
+vvp subtractor_tb.vvp
+```
+
+When all tests pass, the following is printed:
+
+```powershell
+All subtractor tests passed.
+```
+
+If a test fails, the simulation stops and prints the values of a and b, along with the actual and expected differences.
+
+## unsignedComparator
+
+Implements a parameterized unsigned magnitude comparator.
+
+The default width is four bits, but the WIDTH parameter can be changed when the module is instantiated.
+
+The module compares two unsigned WIDTH-bit inputs and produces three outputs:
+
+- equal is 1 when a and b have the same value,
+- lessThan is 1 when a is less than b,
+- greaterThan is 1 when a is greater than b.
+
+Exactly one comparison output should be 1 for every valid combination of a and b.
+
+Because a and b are declared without the signed keyword, the comparison operators interpret them as unsigned values.
+
+### SystemVerilog
+
+```systemverilog
+module comparator #(
+    parameter int WIDTH = 4
+)(
+    input logic [WIDTH - 1:0] a,
+    input logic [WIDTH - 1:0] b,
+    output logic equal,
+    output logic lessThan,
+    output logic greaterThan
+);
+
+assign equal = a == b;
+assign lessThan = a < b;
+assign greaterThan = a > b;
+
+endmodule
+```
