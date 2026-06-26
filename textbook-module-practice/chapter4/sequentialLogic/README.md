@@ -1,17 +1,11 @@
+# Modules
 
-# Sequential Logic Modules
-
-This folder contains SystemVerilog modules created while learning sequential logic from Chapter 4 of *Digital Design and Computer Architecture: RISC-V Edition*.
-
-Sequential logic differs from combinational logic because its outputs can depend on previously stored values. These modules use flip-flops and registers that update on clock edges.
-
-## Modules
-
-### asyncResetRegister
+## asyncResetRegister
 
 Stores one input bit on the rising edge of the clock.
 
-#### SystemVerilog
+### SystemVerilog
+
 ```systemverilog
 module asyncResetRegister(
     input logic clk,
@@ -27,7 +21,7 @@ always_ff @(posedge clk, posedge reset)
 endmodule
 ```
 
-#### Testbench
+### Testbench
 
 The testbench generates a clock and checks the main behaviors of the register:
 
@@ -38,6 +32,8 @@ The testbench generates a clock and checks the main behaviors of the register:
 - asserting reset between clock edges clears a nonzero value immediately.
 
 The testbench uses @(posedge clk) and @(negedge clk) to synchronize its tests with the generated clock. A short #1 delay is used after clock and reset events so that nonblocking assignments in the DUT can update before the output is checked.
+
+### SystemVerilog
 
 ```systemverilog
 `timescale 1ns/1ps
@@ -133,7 +129,7 @@ module asyncResetRegister_tb;
 endmodule
 ```
 
-#### Running the Testbench
+### Running the Testbench
 
 From the asyncResetRegister folder, compile the DUT and testbench together:
 
@@ -155,10 +151,10 @@ Testing complete.
 
 If a test fails, the testbench prints the failed behavior, actual output, expected output, and simulation time.
 
-#### Synthesis Result
+### Synthesis Result
 ![Vivado synthesized schematic](asyncResetRegister/images/asyncResetRegisterSynthImage.png)
 
-### sampleHistoryRegister
+## sampleHistoryRegister
 
 Implements two 4-bit registers that store the two most recently captured input values.
 
@@ -169,7 +165,7 @@ Implements two 4-bit registers that store the two most recently captured input v
 - capture enables a new value to be stored.
 - When capture is low, both registers retain their existing values.
 
-#### SystemVerilog
+### SystemVerilog
 
 ```systemverilog
 module sampleHistoryRegister(
@@ -199,7 +195,7 @@ module sampleHistoryRegister(
 
 endmodule
 ```
-#### Testbench
+### Testbench
 
 The self-checking testbench generates a 10 ns clock and verifies the main behaviors of the sample history register:
 
@@ -211,6 +207,8 @@ The self-checking testbench generates a 10 ns clock and verifies the main behavi
 - clear has priority over capture when both controls are asserted.
 
 An error counter records each failed test. The simulation reports whether all tests passed before stopping.
+
+### SystemVerilog
 
 ```systemverilog
 `timescale 1ns/1ps 
@@ -380,7 +378,8 @@ module sampleHistoryRegister_tb;
 
 endmodule
 ```
-#### Running the Testbench
+
+### Running the Testbench
 
 From the sampleHistoryRegister folder, compile the DUT and testbench together:
 
@@ -401,11 +400,11 @@ ALL TESTS PASSED
 
 If a test fails, the testbench prints the failed behavior, actual outputs, expected outputs, and simulation time.
 
-#### Synthesis Result
+### Synthesis Result
 
 ![Vivado synthesized schematic](sampleHistoryRegister/images/sampleHistoryRegisterSynthImage.png)
 
-### threeSampleAnalyzer
+## threeSampleAnalyzer
 
 Stores the three most recelty capture 4-bit inputs and analyzes them.
 
@@ -418,7 +417,7 @@ Stores the three most recelty capture 4-bit inputs and analyzes them.
 - increasing is high when (newest > middle > oldest).
 - The combinational calculations use blocking assignments because later calculations depend on earlier intermediate results.
 
-#### SystemVerilog
+### SystemVerilog
 
 ```systemverilog
 module threeSampleAnalyzer(
@@ -459,11 +458,11 @@ always_comb begin
 endmodule
 ```
 
-#### Synthesis Result
+### Synthesis Result
 
 ![Vivado synthesized schematic](threeSampleAnalyzer/images/threeSampleAnalyzerSynthImage.png)
 
-### mooreTurnstile
+## mooreTurnstile
 
 Implements a Moore finite state machine that controls a turnstile with locked, unlocked, and alarm states.
 
@@ -478,7 +477,7 @@ Implements a Moore finite state machine that controls a turnstile with locked, u
 - unlocked and alarm depend only on the current state, making this a Moore FSM.
 - reset asynchronously returns the FSM to the locked state.
 
-#### SystemVerilog
+### SystemVerilog
 
 ```systemverilog
 module mooreTurnstile(
@@ -561,7 +560,7 @@ module mooreTurnstile(
 endmodule
 ```
 
-#### Testbench
+### Testbench
 
 The self-checking testbench generates a 10 ns clock and verifies the main behaviors of the Moore turnstile FSM:
 
@@ -577,6 +576,8 @@ The self-checking testbench generates a 10 ns clock and verifies the main behavi
 The Moore timing test demonstrates that unlocked and alarm depend only on the current state. Changing an input may change nextstate, but the outputs do not change until the stored state updates on a rising clock edge.
 
 An error counter records each failed test. The simulation reports whether all tests passed before stopping.
+
+### SystemVerilog
 
 ```systemverilog
 `timescale 1ns/1ps
@@ -767,7 +768,7 @@ module mooreTurnstile_tb;
 endmodule
 ```
 
-#### Running the Testbench
+### Running the Testbench
 
 From the mooreTurnstile folder, compile the DUT and testbench together:
 
@@ -789,11 +790,11 @@ ALL TESTS PASSED
 
 If a test fails, the testbench prints the failed behavior, actual outputs, expected outputs, and simulation time.
 
-#### Synthesis Result
+### Synthesis Result
 
 ![Vivado synthesized schematic](mooreTurnstile/images/mooreTurnstileSynthImage.png)
 
-### mealyVendingMachine
+## mealyVendingMachine
 
 Implements a Mealy finite state machine for a vending machine that dispenses an item after receiving at least 15 cents.
 
@@ -809,7 +810,7 @@ Implements a Mealy finite state machine for a vending machine that dispenses an 
 - reset asynchronously returns the FSM to the 0-cent state.
 - The design assumes nickel and dime are not high during the same cycle.
 
-#### SystemVerilog
+### SystemVerilog
 
 ```systemverilog
 module mealyVendingMachine(
@@ -870,7 +871,7 @@ module mealyVendingMachine(
 endmodule
 ```
 
-#### Testbench
+### Testbench
 
 The self-checking testbench generates a 10 ns clock and verifies the main behaviors of the Mealy vending machine FSM:
 
@@ -889,6 +890,8 @@ The Mealy timing tests check dispense before the next rising clock edge. Because
 The coin inputs are treated as temporary pulses. After a coin is sampled or used to produce a Mealy output, the corresponding input is returned low so that it is not interpreted as another coin.
 
 An error counter records each failed test. The simulation reports whether all tests passed before stopping.
+
+### SystemVerilog
 
 ```systemverilog
 `timescale 1ns/1ps
@@ -1196,7 +1199,7 @@ module mealyVendingMachine_tb;
 endmodule
 ```
 
-#### Running the Testbench
+### Running the Testbench
 
 From the mealyVendingMachine folder, compile the DUT and testbench together:
 
@@ -1218,6 +1221,6 @@ ALL TESTS PASSED
 
 If a test fails, the testbench prints the failed behavior, actual output, expected output, and simulation time.
 
-#### Synthesis Result
+### Synthesis Result
 
 ![Vivado synthesized schematic](mealyVendingMachine/images/mealyVendingMachineSynthImage.png)
