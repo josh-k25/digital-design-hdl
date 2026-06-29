@@ -329,6 +329,10 @@ All CLA tests passed.
 
 If a test fails, the testbench prints the values of a, b, and cin, along with the actual and expected results.
 
+### Synthesis Result
+
+![Vivado synthesized schematic](claAdder/images/claAdderSynthImage.png)
+
 ## subtractor
 
 Implements a parameterized subtractor using two’s complement addition.
