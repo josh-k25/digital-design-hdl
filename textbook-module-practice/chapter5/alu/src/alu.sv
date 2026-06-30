@@ -3,7 +3,7 @@ module alu (
     input logic [3:0] b,
     input logic [1:0] aluControl,
     
-    output logic [3:0] result
+    output logic [3:0] result,
     
     // negative flag
     output logic N,
