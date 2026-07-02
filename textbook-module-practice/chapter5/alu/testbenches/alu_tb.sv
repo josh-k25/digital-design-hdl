@@ -2,7 +2,7 @@ module alu_tb;
 
 logic [3:0] a;
 logic [3:0] b;
-logic [1:0] aluControl;
+logic [2:0] aluControl;
 logic [3:0] result;
 
 logic N;
@@ -26,7 +26,7 @@ initial begin
     //add: 2 + 3 = 5
     a = 4'b0010;
     b = 4'b0011;
-    aluControl = 2'b00;
+    aluControl = 3'b000;
     #1;
 
     if (result !== 4'b0101)
@@ -37,7 +37,7 @@ initial begin
     //subtract: 5 - 3 = 2
     a = 4'b0101;
     b = 4'b0011;
-    aluControl = 2'b01;
+    aluControl = 3'b001;
     #1;
 
     if (result !== 4'b0010)
@@ -48,7 +48,7 @@ initial begin
     //and
     a = 4'b1010;
     b = 4'b1100;
-    aluControl = 2'b10;
+    aluControl = 3'b010;
     #1;
 
     if (result !== 4'b1000)
@@ -57,7 +57,7 @@ initial begin
     );
 
     //or
-    aluControl = 2'b11;
+    aluControl = 3'b011;
     #1;
 
     if (result !== 4'b1110)
@@ -69,7 +69,7 @@ initial begin
     //zero flag test (5 - 5 = 0)
     a = 4'b0101;
     b = 4'b0101;
-    aluControl = 2'b01;
+    aluControl = 3'b001;
     #1;
     
     if (result !== 4'b0000 || Z !== 1'b1)
@@ -80,7 +80,7 @@ initial begin
     //negative flag test (3 - 5 = -2)
     a = 4'b0011;
     b = 4'b0101;
-    aluControl = 2'b01;
+    aluControl = 3'b001;
     #1;
 
     if (result !== 4'b1110 || N !== 1'b1)
@@ -91,7 +91,7 @@ initial begin
     //carry flag test (15 + 1 = 0 w carry-out)
     a = 4'b1111;
     b = 4'b0001;
-    aluControl = 2'b00;
+    aluControl = 3'b000;
     #1;
 
     if (result !== 4'b0000 || C !== 1'b1)
@@ -102,7 +102,7 @@ initial begin
     //carry should remain off: 2 + 3 = 5
     a = 4'b0010;
     b = 4'b0011;
-    aluControl = 2'b00;
+    aluControl = 3'b000;
     #1;
 
     if (result !== 4'b0101 || C !== 1'b0)
@@ -113,7 +113,7 @@ initial begin
     //overflow test 1: pos + pos -> neg looking result
     a= 4'b0111;
     b = 4'b0001;
-    aluControl = 2'b00;
+    aluControl = 3'b000;
     #1;
 
     if (result !== 4'b1000 || V !== 1'b1)
@@ -124,7 +124,7 @@ initial begin
         //overflow test 2: neg + neg -> pos looking result
     a = 4'b1100;
     b = 4'b1011;
-    aluControl = 2'b00;
+    aluControl = 3'b000;
     #1;
 
     if (result !== 4'b0111 || V !== 1'b1)
@@ -136,7 +136,7 @@ initial begin
     //overflow test 3: pos - neg -> neg looking result
     a = 4'b0111;
     b = 4'b1111;
-    aluControl = 2'b01;
+    aluControl = 3'b001;
     #1;
 
     if (result !== 4'b1000 || V !== 1'b1)
@@ -148,7 +148,7 @@ initial begin
     //overflow test 4: neg - pos -> pos looking result
     a = 4'b1000;
     b = 4'b0001;
-    aluControl = 2'b01;
+    aluControl = 3'b001;
     #1;
 
     if (result !== 4'b0111 || V !== 1'b1)
@@ -159,7 +159,7 @@ initial begin
     //overflow test 5: pos - pos -> pos result (V should be off)
     a = 4'b0100;
     b = 4'b0001;
-    aluControl = 2'b01;
+    aluControl = 3'b001;
     #1;
 
     if (result !== 4'b0011 || V !== 1'b0)
@@ -170,7 +170,7 @@ initial begin
     //overflow test 6: pos + pos -> pos result 
     a = 4'b0100;
     b = 4'b0001;
-    aluControl = 2'b00;
+    aluControl = 3'b000;
     #1;
 
     if (result !== 4'b0101 || V !== 1'b0)
