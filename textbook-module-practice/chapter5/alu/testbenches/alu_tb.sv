@@ -178,6 +178,50 @@ initial begin
             "ADD incorrectly asserted overflow: 4 + 1, result=%b V=%b", result, V
     );
 
+    //signed SLT test: -1 < 2
+    a = 4'b1111;
+    b = 4'b0010;
+    aluControl = 3'b101;
+    #1;
+
+    if (result !== 4'b0001)
+        $fatal(1,
+            "SLT failed: result=%b expected=0001",result,
+    );
+
+    //signed SLT test: 7 < -2
+    a = 4'b0111;
+    b = 4'b1110;
+    aluControl = 3'b101;
+    #1;
+
+    if (result !== 4'b0000)
+        $fatal(1,
+        "SLT failed: result=%b expected=0000", result,
+        );
+
+    //unsigned SLT test: 3 < 5
+    a = 4'b0011;
+    b = 4'b0101;
+    aluControl = 3'b110;
+    #1;
+
+    if (result !== 4'b0001)
+        $fatal(1,
+            "SLTU failed: result=%b expected=0001", result
+        );
+
+    //unsigned SLT test: 15 < 2 
+    a = 4'b1111;
+    b = 4'b0010;
+    aluControl = 3'b110;
+    #1;
+
+    if (result !== 4'b0000)
+        $fatal(1,
+            "SLTU failed: result=%b expected=0000", result
+        );
+
     $display("All ALU tests with flags passed.");
     $finish;
 end

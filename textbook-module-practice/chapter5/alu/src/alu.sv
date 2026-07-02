@@ -12,11 +12,8 @@ module alu (
     // carry flag 
     output logic C,
     // overflow flag
-    output logic V,
+    output logic V
 
-    // set less than 
-    output logic lessThan,
-    output logic lessThanUnsigned
 );
 
 logic subtract;
@@ -24,6 +21,10 @@ logic [3:0] modifiedB;
 logic [3:0] arithmeticResult;
 logic arithmeticCout;
 logic arithmeticOverflow;
+
+// set less than 
+output logic lessThan;
+output logic lessThanUnsigned;
 
 //subtract being high generates a cin which is the + 1 for twos compliment in the subtraction
 assign subtract  = (aluControl == 3'b001) || (aluControl == 3'b101) || (aluControl == 3'b110);
