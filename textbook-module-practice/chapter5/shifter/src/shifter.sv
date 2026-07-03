@@ -10,7 +10,7 @@ always_comb begin
     case(shiftType)
         2'b00: result = num << shiftAmount;
         2'b01: result = num >> shiftAmount;
-        2'b10: result = $(signed)num >>> shiftAmount;
+        2'b10: result = $signed(num) >>> shiftAmount;
         2'b11: result = num;
     endcase
 end
