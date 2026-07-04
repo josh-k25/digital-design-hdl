@@ -1,0 +1,77 @@
+#! /c/Source/iverilog-install/bin/vvp
+:ivl_version "12.0 (devel)" "(s20150603-1539-g2693dd32b)";
+:ivl_delay_selection "TYPICAL";
+:vpi_time_precision - 12;
+:vpi_module "C:\iverilog\lib\ivl\system.vpi";
+:vpi_module "C:\iverilog\lib\ivl\vhdl_sys.vpi";
+:vpi_module "C:\iverilog\lib\ivl\vhdl_textio.vpi";
+:vpi_module "C:\iverilog\lib\ivl\v2005_math.vpi";
+:vpi_module "C:\iverilog\lib\ivl\va_math.vpi";
+:vpi_module "C:\iverilog\lib\ivl\v2009.vpi";
+S_00000278b293ad30 .scope package, "$unit" "$unit" 2 1;
+ .timescale 0 0;
+S_00000278b293b340 .scope module, "instructionMemory_tb" "instructionMemory_tb" 3 3;
+ .timescale -9 -12;
+P_00000278b2a59010 .param/l "test_DEPTH" 1 3 5, +C4<00000000000000000000000000001000>;
+P_00000278b2a59048 .param/l "test_WIDTH" 1 3 6, +C4<00000000000000000000000000100000>;
+v00000278b2936700_0 .var "address", 2 0;
+v00000278b29367a0_0 .net "rd", 31 0, L_00000278b2a59a10;  1 drivers
+S_00000278b293b4d0 .scope module, "dut" "instructionMemory" 3 15, 4 1 0, S_00000278b293b340;
+ .timescale 0 0;
+    .port_info 0 /INPUT 3 "address";
+    .port_info 1 /OUTPUT 32 "rd";
+P_00000278b293b660 .param/l "DEPTH" 0 4 2, +C4<00000000000000000000000000001000>;
+P_00000278b293b698 .param/l "WIDTH" 0 4 3, +C4<00000000000000000000000000100000>;
+P_00000278b293b6d0 .param/str "fileName" 0 4 4, "program.hex";
+L_00000278b2a59a10 .functor BUFZ 32, L_00000278b2936840, C4<00000000000000000000000000000000>, C4<00000000000000000000000000000000>, C4<00000000000000000000000000000000>;
+v00000278b2936d20_0 .net *"_ivl_0", 31 0, L_00000278b2936840;  1 drivers
+v00000278b2936ee0_0 .net *"_ivl_2", 4 0, L_00000278b29368e0;  1 drivers
+L_00000278b2aa1828 .functor BUFT 1, C4<00>, C4<0>, C4<0>, C4<0>;
+v00000278b29370b0_0 .net *"_ivl_5", 1 0, L_00000278b2aa1828;  1 drivers
+v00000278b293aec0_0 .net "address", 2 0, v00000278b2936700_0;  1 drivers
+v00000278b293be60 .array "memory", 7 0, 31 0;
+v00000278b293bf00_0 .net "rd", 31 0, L_00000278b2a59a10;  alias, 1 drivers
+L_00000278b2936840 .array/port v00000278b293be60, L_00000278b29368e0;
+L_00000278b29368e0 .concat [ 3 2 0 0], v00000278b2936700_0, L_00000278b2aa1828;
+    .scope S_00000278b293b4d0;
+T_0 ;
+    %vpi_call/w 4 13 "$readmemh", P_00000278b293b6d0, v00000278b293be60 {0 0 0};
+    %end;
+    .thread T_0;
+    .scope S_00000278b293b340;
+T_1 ;
+    %pushi/vec4 0, 0, 3;
+    %store/vec4 v00000278b2936700_0, 0, 3;
+    %delay 1000, 0;
+    %load/vec4 v00000278b29367a0_0;
+    %cmpi/ne 0, 0, 32;
+    %jmp/0xz  T_1.0, 6;
+    %vpi_call/w 3 26 "$fatal", 32'sb00000000000000000000000000000001, "First entry read failed: rd=%h expected=00000000", v00000278b29367a0_0 {0 0 0};
+T_1.0 ;
+    %pushi/vec4 7, 0, 3;
+    %store/vec4 v00000278b2936700_0, 0, 3;
+    %delay 1000, 0;
+    %load/vec4 v00000278b29367a0_0;
+    %cmpi/ne 3405691582, 0, 32;
+    %jmp/0xz  T_1.2, 6;
+    %vpi_call/w 3 34 "$fatal", 32'sb00000000000000000000000000000001, "Last entry read failed: rd=%h expected=CAFEBABE", v00000278b29367a0_0 {0 0 0};
+T_1.2 ;
+    %pushi/vec4 4, 0, 3;
+    %store/vec4 v00000278b2936700_0, 0, 3;
+    %delay 1000, 0;
+    %load/vec4 v00000278b29367a0_0;
+    %cmpi/ne 2779096485, 0, 32;
+    %jmp/0xz  T_1.4, 6;
+    %vpi_call/w 3 42 "$fatal", 32'sb00000000000000000000000000000001, "Middle entry read failed: rd=%h expected=A5A5A5A5", v00000278b29367a0_0 {0 0 0};
+T_1.4 ;
+    %vpi_call/w 3 45 "$display", "All tests passed" {0 0 0};
+    %vpi_call/w 3 46 "$finish" {0 0 0};
+    %end;
+    .thread T_1;
+# The file index is used to find the file name in the following table.
+:file_names 5;
+    "N/A";
+    "<interactive>";
+    "-";
+    ".\testbenches\instructionMemory_tb.sv";
+    ".\src\instructionMemory.sv";
