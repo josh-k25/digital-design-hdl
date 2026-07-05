@@ -102,7 +102,7 @@ initial begin
         "Arithmetic right by 1 (MSB = 0) failed, num=%d expected=2000_0000", num
         );
     
-    $display("All ALU tests with flags passed.");
+    $display("All tests passed.");
     $finish;
     end
 endmodule
