@@ -1,71 +1,43 @@
 # Digital Design HDL
 
-A growing collection of SystemVerilog modules, testbenches, synthesis results, and FPGA exercises created while learning digital logic and computer architecture.
+SystemVerilog modules and testbenches created while working through *Digital Design and Computer Architecture: RISC-V Edition* by Sarah Harris and David Harris.
 
-The repository follows *Digital Design and Computer Architecture: RISC-V Edition* by Sarah Harris and David Harris.
+The repository is mainly used to practice digital design concepts before building a RISC-V processor.
 
-## Current Focus
+## Topics
 
-The current work covers Chapter 4 topics, including:
+Current work includes:
 
 - combinational and sequential logic
-- structural and behavioral SystemVerilog
-- blocking and nonblocking assignments
-- registers, counters, and finite state machines
+- arithmetic circuits
+- registers and finite state machines
+- register files and memories
+- SystemVerilog RTL
 - self-checking testbenches
-- simulation with Icarus Verilog
-- synthesis and schematic inspection with Vivado.
+- RISC-V architecture and CPU preparation
 
-## Repository Structure
 
-```text
-digital-design-hdl/
-├── textbook-module-practice/
-│   └── chapter04-hdl/
-│       ├── combinationalLogic/
-│       └── sequentialLogic/
-└── README.md
-```
-
-### [Combinational Logic](textbook-module-practice/chapter04-hdl/combinationalLogic)
-
-SystemVerilog modules whose outputs depend only on their current inputs. Examples include Boolean functions, reduction operators, function selectors, and a small ALU.
-
-### [Sequential Logic](textbook-module-practice/chapter04-hdl/sequentialLogic)
-
-Clocked modules whose outputs depend on stored state. Examples include resettable registers, sample-history registers, counters, sequence detectors, and finite state machines. This section also includes self-checking testbenches and simulation commands.
-
-Each module folder may contain:
-
-```text
-moduleName/
-├── src/             # Synthesizable SystemVerilog source
-├── testbenches/     # Simulation-only verification code
-└── images/          # Vivado synthesized schematics or waveforms
-```
-
-The README files inside each topic folder contain module descriptions, source excerpts, testbench behavior, simulation commands, and synthesis images.
+- src: synthesizable SystemVerilog
+- testbenches: simulation and verification code
+- images: schematics or waveforms when useful
 
 ## Tools
 
-- **SystemVerilog** - RTL design and testbenches
-- **Icarus Verilog** - command-line compilation and simulation
-- **GTKWave** - waveform viewing when needed
-- **Vivado** - synthesis, implementation, and FPGA programming
-- **Basys 3** - physical FPGA demonstrations for modules that benefit from switches, LEDs, clocks, or other board I/O
+- SystemVerilog
+- Icarus Verilog
+- GTKWave
+- Vivado
+- Basys 3 FPGA
 
 ## Running a Testbench
 
-From a module folder, compile the design and its testbench using SystemVerilog support:
+From a module folder:
 
 ```powershell
-iverilog -g2012 -s <testbench_module> -o simulation.vvp src\<module>.sv testbenches\<testbench>.sv
+iverilog -g2012 -s <module>_tb -o <module>_tb src\<module>.sv testbenches\<module>_tb.sv
+vvp <module>_tb
 ```
 
-Run the compiled simulation:
+Some modules depend on additional source files, which must also be included in the compile command.
 
-```powershell
-vvp simulation.vvp
-```
-
-The self-checking testbenches report whether the tested behavior passed or failed.
+The testbenches are self-checking and report whether the tested behavior passed or failed.
